@@ -1,0 +1,22 @@
+node_modules/
+build/
+coverage/
+.DS_Store
+*.log
+
+# Variáveis de ambiente — NUNCA subir para o GitHub
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Manter o exemplo como referência
+!.env.example
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db

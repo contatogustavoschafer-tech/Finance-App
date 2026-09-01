@@ -1,0 +1,6 @@
+{
+  "name": "Assistente Financeiro IA",
+  "description": "Assistente financeiro com IA multimodal (áudio, texto e fotos de notas fiscais) integrado ao Google Sheets para lançamentos e controle de gastos.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
