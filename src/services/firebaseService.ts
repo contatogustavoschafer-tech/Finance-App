@@ -13,15 +13,14 @@ import {
 import { AppUser, AppUserId, BudgetGoal, Transaction } from '../types';
 import { INITIAL_TRANSACTIONS, INITIAL_BUDGET_GOALS } from '../constants/initialData';
 
-// Configuração do Firebase extraída do projeto Artemis Semijoias
+// Firebase do projeto Finance IA (projeto dedicado)
 export const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDJIGAACeImlhfd33E_ScfIVDOM6aHzr9c",
-  authDomain: "artemis-semijoias.firebaseapp.com",
-  projectId: "artemis-semijoias",
-  storageBucket: "artemis-semijoias.firebasestorage.app",
-  messagingSenderId: "805016886138",
-  appId: "1:805016886138:web:3f022afed05ad3404914c3",
-  measurementId: "G-D51B4S0R02"
+  apiKey: "AIzaSyAFdtElW2QLYOuucmkyP3PN6RhtzHH1sms",
+  authDomain: "finance-ia-3520a.firebaseapp.com",
+  projectId: "finance-ia-3520a",
+  storageBucket: "finance-ia-3520a.firebasestorage.app",
+  messagingSenderId: "960415534556",
+  appId: "1:960415534556:web:5f761beb912d51d6dd5319"
 };
 
 const SESSION_STORAGE_KEY = 'finance_ia_auth_user';

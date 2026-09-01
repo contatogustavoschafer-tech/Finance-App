@@ -82,11 +82,11 @@ var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function generateContentWithFallback(ai, params) {
   const modelsToTry = [
     "gemini-2.5-flash",
+    "gemini-2.5-pro",
     "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-1.5-pro"
+    "gemini-1.5-flash"
   ];
-  const MAX_RETRIES = 3;
+  const MAX_RETRIES = 2;
   let lastError = null;
   for (const model of modelsToTry) {
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -99,14 +99,18 @@ async function generateContentWithFallback(ai, params) {
         return response;
       } catch (err) {
         lastError = err;
-        const isRetryable = err?.status === 503 || err?.status === 429 || err?.status === 500 || (err?.message || "").toLowerCase().includes("overload") || (err?.message || "").toLowerCase().includes("unavailable");
+        const msg = (err?.message || "").toLowerCase();
+        if (msg.includes("leaked") || err?.status === 403) {
+          throw new Error("Sua chave do Gemini foi bloqueada pelo Google por seguran\xE7a (leaked API key). Por favor, gere uma nova chave gratuita em aistudio.google.com.");
+        }
+        const isRetryable = err?.status === 503 || err?.status === 429 || err?.status === 500 || msg.includes("overload") || msg.includes("unavailable");
         if (isRetryable && attempt < MAX_RETRIES) {
-          const delay = attempt * 1200;
-          console.warn(`Model ${model} retryable error (attempt ${attempt}/${MAX_RETRIES}), retrying in ${delay}ms:`, err?.message);
+          const delay = attempt * 1e3;
+          console.warn(`Modelo ${model} oscilou (tentativa ${attempt}/${MAX_RETRIES}), tentando novamente em ${delay}ms...`);
           await sleep(delay);
           continue;
         }
-        console.warn(`Model ${model} failed permanently (attempt ${attempt}):`, err?.message || err);
+        console.warn(`Tentando pr\xF3ximo modelo (falha em ${model}):`, err?.message || err);
         break;
       }
     }
