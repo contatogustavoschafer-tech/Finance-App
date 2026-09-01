@@ -82,6 +82,7 @@ function getGeminiClient() {
   }
   return new import_genai.GoogleGenAI({ apiKey });
 }
+var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function generateContentWithFallback(ai, params) {
   const modelsToTry = [
     "gemini-2.5-flash",
@@ -89,19 +90,29 @@ async function generateContentWithFallback(ai, params) {
     "gemini-1.5-flash",
     "gemini-1.5-pro"
   ];
+  const MAX_RETRIES = 3;
   let lastError = null;
   for (const model of modelsToTry) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents: params.contents,
-        config: params.config
-      });
-      return response;
-    } catch (err) {
-      lastError = err;
-      console.warn(`Model ${model} encountered error:`, err?.message || err);
-      continue;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: params.contents,
+          config: params.config
+        });
+        return response;
+      } catch (err) {
+        lastError = err;
+        const isRetryable = err?.status === 503 || err?.status === 429 || err?.status === 500 || (err?.message || "").toLowerCase().includes("overload") || (err?.message || "").toLowerCase().includes("unavailable");
+        if (isRetryable && attempt < MAX_RETRIES) {
+          const delay = attempt * 1200;
+          console.warn(`Model ${model} retryable error (attempt ${attempt}/${MAX_RETRIES}), retrying in ${delay}ms:`, err?.message);
+          await sleep(delay);
+          continue;
+        }
+        console.warn(`Model ${model} failed permanently (attempt ${attempt}):`, err?.message || err);
+        break;
+      }
     }
   }
   throw lastError || new Error("Todos os modelos de IA do Gemini est\xE3o temporariamente indispon\xEDveis.");
@@ -296,7 +307,7 @@ Instru\xE7\xF5es Especiais de Formata\xE7\xE3o e A\xE7\xE3o:
 [SUGGESTED_CHIPS: ["Pergunta 1", "Pergunta 2", "Pergunta 3"]]`;
     const contents = [];
     if (Array.isArray(history)) {
-      for (const h of history.slice(-6)) {
+      for (const h of history.slice(-10)) {
         contents.push({
           role: h.role === "assistant" ? "model" : "user",
           parts: [{ text: h.content }]
