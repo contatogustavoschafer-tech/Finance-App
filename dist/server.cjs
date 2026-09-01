@@ -24,16 +24,12 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 // server.ts
 var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
-var import_url = require("url");
 var import_dotenv = __toESM(require("dotenv"), 1);
 var import_genai = require("@google/genai");
 var import_vite = require("vite");
-var import_meta = {};
 import_dotenv.default.config();
-var __filename = (0, import_url.fileURLToPath)(import_meta.url);
-var __dirname = import_path.default.dirname(__filename);
 var app = (0, import_express.default)();
-var PORT = 3e3;
+var PORT = Number(process.env.PORT) || 3e3;
 app.use(import_express.default.json({ limit: "30mb" }));
 app.use(import_express.default.urlencoded({ extended: true, limit: "30mb" }));
 function cleanMediaPayload(base64Input, providedMimeType, defaultMime = "application/octet-stream") {
